@@ -22,15 +22,16 @@
 - [x] **테스트 범위 확대** (`tests/`)
   - 현재 `test_quotes.py`만 있다. `render.py`는 일부, `stockpulse.py`의 `symbols_from`/`_itick_params`, `herdr_api.py`의 응답 파싱, `panel.py`의 토큰 보고 로직은 테스트가 없다.
   - 처리: `test_stockpulse.py`, `test_herdr_api.py`, `test_panel.py`를 추가했다. 소켓 호출은 `_exchange_unix`를 fake로 바꿔 검증한다. `herdr_cli`(`stockpulse.py`)는 아직 테스트하지 않았다.
-- [ ] **Python 3.8 지원 주장 검증** (`docs/usage.md`) — 문법 검사 완료, 런타임은 CI 대기
+- [x] **Python 3.8 지원 주장 검증** (`docs/usage.md`)
   - 문서에 3.8 이상을 명시했으나 실제 실행 확인은 3.12(`__pycache__`)만 보인다.
-  - 처리: 3.8 문법(`ast.parse(feature_version=(3, 8))`)은 통과했다. 로컬에 3.8이 없어 실행 확인은 CI 매트릭스(3.8, 3.12)에서 한다.
-- [ ] **CI 없음** — 워크플로 추가 완료, 아직 푸시하지 않아 실제 실행은 미확인
+  - 처리: `uv python install 3.8`(3.8.20)로 로컬에서 전체 테스트를 통과했다. 3.12에서도 통과했다.
+- [ ] **CI 없음** — 워크플로 추가 완료, 푸시 후 실제 실행 결과 확인 필요
   - 처리: `.github/workflows/test.yml`에 Windows/Linux/macOS × Python 3.8/3.12 매트릭스를 추가했다.
-- [ ] **Yahoo Finance 비공식 엔드포인트 의존에 대한 대응** (`src/quotes.py`)
+- [x] **Yahoo Finance 비공식 엔드포인트 의존에 대한 대응** (`src/quotes.py`)
   - 공식 API가 아니어서 차단이나 응답 형식 변경에 취약하다.
-  - 처리: User-Agent를 `herdr-stockpulse`로 바꿔 버전 불일치를 없앴다. 캐시와 백오프는 아직 미정.
-  - 실패가 반복될 때 짧은 캐시나 재시도 백오프를 검토한다.
+  - 처리: User-Agent를 `herdr-stockpulse`로 바꿔 버전 불일치를 없앴다.
+  - 처리: 429·5xx·네트워크 오류(`TransientQuoteError`)에 한해 1초 뒤 한 번 재시도한다. 영구 오류(404 등)는 재시도하지 않는다.
+  - 캐시는 넣지 않았다. 패널이 60초마다 갱신하므로 캐시 이득이 거의 없다고 판단했다.
 
 ## 낮음
 

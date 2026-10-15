@@ -8,7 +8,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 from unittest import mock
 
 import panel
-from quotes import Quote, QuoteError, fetch_itick, fetch_yahoo
+from urllib.error import HTTPError
+
+from quotes import Quote, QuoteError, TransientQuoteError, _get_json, fetch_itick, fetch_yahoo
 from render import MAX_SIDEBAR_QUOTES, format_quote, sidebar_quote_tokens, trend_label
 
 
@@ -88,6 +90,65 @@ class YahooQuoteTests(unittest.TestCase):
 
         self.assertEqual(len([name for name in tokens if name.startswith("sp_quote_")]), MAX_SIDEBAR_QUOTES * 2 + 1)
         self.assertEqual(tokens["sp_quote_more"], "+2 more symbols")
+
+
+class YahooRetryTests(unittest.TestCase):
+    PAYLOAD = {"chart": {"result": [{"meta": {"regularMarketPrice": 5}}]}}
+
+    def test_retries_once_after_transient_failure(self):
+        responses = [TransientQuoteError("HTTP Error 503"), self.PAYLOAD]
+
+        def flaky_get_json(_url):
+            response = responses.pop(0)
+            if isinstance(response, Exception):
+                raise response
+            return response
+
+        with mock.patch("quotes.RETRY_DELAY_SECONDS", 0):
+            quote = fetch_yahoo("EXM", flaky_get_json)
+
+        self.assertEqual(quote.price, 5)
+        self.assertEqual(responses, [])
+
+    def test_does_not_retry_permanent_failure(self):
+        calls = []
+
+        def rejected(_url):
+            calls.append(1)
+            raise QuoteError("HTTP Error 404")
+
+        with self.assertRaises(QuoteError):
+            fetch_yahoo("EXM", rejected)
+        self.assertEqual(len(calls), 1)
+
+    def test_gives_up_after_second_transient_failure(self):
+        calls = []
+
+        def always_down(_url):
+            calls.append(1)
+            raise TransientQuoteError("timed out")
+
+        with mock.patch("quotes.RETRY_DELAY_SECONDS", 0), self.assertRaises(TransientQuoteError):
+            fetch_yahoo("EXM", always_down)
+        self.assertEqual(len(calls), 2)
+
+
+class HttpStatusClassificationTests(unittest.TestCase):
+    def classify(self, code):
+        error = HTTPError("https://example.test", code, "x", None, None)
+        with mock.patch("quotes.urlopen", side_effect=error):
+            with self.assertRaises(QuoteError) as caught:
+                _get_json("https://example.test")
+        return caught.exception
+
+    def test_rate_limit_and_server_errors_are_transient(self):
+        self.assertIsInstance(self.classify(429), TransientQuoteError)
+        self.assertIsInstance(self.classify(503), TransientQuoteError)
+
+    def test_client_errors_are_permanent(self):
+        error = self.classify(404)
+        self.assertIsInstance(error, QuoteError)
+        self.assertNotIsInstance(error, TransientQuoteError)
 
 
 class ITickQuoteTests(unittest.TestCase):
