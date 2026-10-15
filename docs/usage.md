@@ -53,14 +53,23 @@ automatically every 60 seconds. Press `Ctrl+C` in that pane to close it.
 You can also invoke the dashboard action directly:
 
 ```sh
-herdr plugin action invoke herdr-stockpulse.open
+herdr plugin action invoke open --plugin herdr-stockpulse
 ```
 
 On Windows, use the platform-specific action ID:
 
 ```powershell
-herdr plugin action invoke herdr-stockpulse.open-windows
+herdr plugin action invoke open-windows --plugin herdr-stockpulse
 ```
+
+### Reopen after Ctrl+C
+
+Pressing Ctrl+C in the dashboard closes its pane, and the quotes row leaves the
+sidebar after about 90 seconds. Creating a workspace does not reopen it — run
+"StockPulse: open dashboard" from the herdr command palette, or one of the
+commands above. Typing just `open` in a shell does not work. Put the action
+id first and the plugin in `--plugin`; `herdr plugin action invoke
+herdr-stockpulse open-windows` fails with `unknown option`.
 
 **StockPulse: refresh configured quotes** remains available when you want a
 one-time refresh in the herdr plugin command log.
