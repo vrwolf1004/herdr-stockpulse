@@ -32,13 +32,16 @@ creates it without changing focus.
 The dashboard uses herdr's socket API to:
 
 1. Register its pane as the idle `stockpulse` agent.
-2. Report a `$sp_quotes` token with a 90-second TTL.
+2. Report one `$sp_quote_N` token for each visible quote with a 90-second TTL.
 3. Release the agent registration when the dashboard stops.
 
-The token contains up to three quotes in configured order. Each quote has its
-trend marker, symbol, price, and daily percentage; additional configured
-symbols are represented by `+N`. The Agents sidebar displays this token only
-when its layout includes a `$sp_quotes` row.
+The first five quotes in configured order are reported as two rows each:
+`$sp_quote_N_name` contains the company name and `$sp_quote_N_price` contains
+the trend marker, currency, price, and daily percentage. Long names are
+shortened; the symbol is used only when a provider has no company name. Any
+remaining configured symbols are represented by `$sp_quote_more` as
+`+N more symbols`. The Agents sidebar displays tokens only when its layout
+includes the matching `$sp_quote_*` rows.
 
 The dashboard refresh interval is 60 seconds. Individual provider failures are
 rendered beside their affected symbol. Configuration errors and unexpected

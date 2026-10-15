@@ -15,7 +15,7 @@ from urllib.parse import quote as url_quote
 from urllib.request import Request, urlopen
 
 YAHOO_CHART_URL = "https://query1.finance.yahoo.com/v8/finance/chart/{symbol}?interval=1d&range=1d"
-ITICK_TICK_URL = "https://api.itick.org/stock/tick?region={region}&code={code}&token={token}"
+ITICK_TICK_URL = "https://api.itick.org/stock/tick?region={region}&code={code}"
 REQUEST_TIMEOUT_SECONDS = 10
 
 
@@ -49,7 +49,7 @@ class Quote:
 def _get_json(url: str, headers: Optional[dict[str, str]] = None) -> dict[str, Any]:
     request = Request(
         url,
-        headers={"Accept": "application/json", "User-Agent": "herdr-stockpulse/0.1", **(headers or {})},
+        headers={"Accept": "application/json", "User-Agent": "herdr-stockpulse", **(headers or {})},
     )
     try:
         with urlopen(request, timeout=REQUEST_TIMEOUT_SECONDS) as response:
@@ -107,7 +107,7 @@ def _itick_params(symbol: str) -> tuple[str, str]:
 def fetch_itick(symbol: str, token: str, get_json: Callable[..., dict[str, Any]] = _get_json) -> Quote:
     """Fetch an iTick fallback quote. iTick does not supply a prior close here."""
     region, code = _itick_params(symbol)
-    url = ITICK_TICK_URL.format(region=region, code=url_quote(code, safe=""), token=url_quote(token, safe=""))
+    url = ITICK_TICK_URL.format(region=region, code=url_quote(code, safe=""))
     payload = get_json(url, headers={"token": token})
     tick = payload.get("data") or payload
     price = _as_float(tick.get("ld") if isinstance(tick, dict) else None)

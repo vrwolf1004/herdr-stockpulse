@@ -4,6 +4,7 @@ import json
 import os
 import socket
 import sys
+import threading
 import time
 
 IS_WINDOWS = sys.platform == "win32"
@@ -64,11 +65,31 @@ def _exchange_pipe(path, payload):
         return _read_line(pipe.read)
 
 
+def _exchange_pipe_with_timeout(path, payload):
+    # Named pipe reads have no socket timeout, so run the exchange on a daemon thread and stop waiting after the limit.
+    outcome = {}
+
+    def run():
+        try:
+            outcome["raw"] = _exchange_pipe(path, payload)
+        except Exception as error:  # noqa: BLE001 - re-raised on the calling thread below
+            outcome["error"] = error
+
+    worker = threading.Thread(target=run, daemon=True)
+    worker.start()
+    worker.join(SOCKET_TIMEOUT_SECONDS)
+    if worker.is_alive():
+        raise TimeoutError(f"no response within {SOCKET_TIMEOUT_SECONDS} seconds")
+    if "error" in outcome:
+        raise outcome["error"]
+    return outcome["raw"]
+
+
 def request(method, params):
     message = {"id": f"stockpulse:{time.time_ns()}", "method": method, "params": params}
     payload = (json.dumps(message, ensure_ascii=False) + "\n").encode("utf-8")
     try:
-        raw = (_exchange_pipe if IS_WINDOWS else _exchange_unix)(socket_path(), payload)
+        raw = (_exchange_pipe_with_timeout if IS_WINDOWS else _exchange_unix)(socket_path(), payload)
     except OSError as error:
         raise HerdrError(f"{method}: {error}") from error
     response = json.loads(raw.decode("utf-8")) if raw else {}

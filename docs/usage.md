@@ -77,22 +77,35 @@ one-time refresh in the herdr plugin command log.
 ## Show quotes in the Agents sidebar
 
 The docked dashboard reports itself as a `stockpulse` agent. Add the following
-row to `[ui.sidebar.agents]` in herdr's `config.toml`, then reload the config:
+rows to `[ui.sidebar.agents]` in herdr's `config.toml`, then reload the config:
 
 ```toml
 [ui.sidebar.agents]
 rows = [
   ["state_icon", "machine", "workspace", "tab"],
   ["agent"],
-  [{ token = "$sp_quotes", fg = "#58a6ff" }],
+  [{ token = "$sp_quote_1_name", fg = "#c9d1d9", bold = true }],
+  [{ token = "$sp_quote_1_price", fg = "#58a6ff" }],
+  [{ token = "$sp_quote_2_name", fg = "#c9d1d9", bold = true }],
+  [{ token = "$sp_quote_2_price", fg = "#58a6ff" }],
+  [{ token = "$sp_quote_3_name", fg = "#c9d1d9", bold = true }],
+  [{ token = "$sp_quote_3_price", fg = "#58a6ff" }],
+  [{ token = "$sp_quote_4_name", fg = "#c9d1d9", bold = true }],
+  [{ token = "$sp_quote_4_price", fg = "#58a6ff" }],
+  [{ token = "$sp_quote_5_name", fg = "#c9d1d9", bold = true }],
+  [{ token = "$sp_quote_5_price", fg = "#58a6ff" }],
+  [{ token = "$sp_quote_more", fg = "#8b949e" }],
 ]
 ```
 
 Preserve any existing rows, including `herdr-ai-feedbag` rows; append the
-`$sp_quotes` row to the current `rows` array instead of replacing it. The row
-is shown only for the StockPulse dashboard pane. It lists up to three symbols,
-including the current price and daily `▲`/`▼` percentage change. If more than
-three symbols are configured, the row ends with `+N` for the number not shown.
+`$sp_quote_*` rows to the current `rows` array instead of replacing it. A row
+is shown only when that quote exists on the StockPulse dashboard pane. Each
+quote uses two rows: a bold company name followed by currency, current price,
+and daily `▲`/`▼` percentage change. Long company names are shortened to keep
+the name readable. If a provider does not return a company name, the stock
+symbol is used instead. The first five configured symbols are shown; additional
+symbols are summarized in the `$sp_quote_more` row.
 
 The row remains visible while the pane is refreshing. If an unexpected refresh
 failure occurs, the dashboard shows its error and retries after 60 seconds.
