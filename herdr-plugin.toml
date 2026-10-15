@@ -1,0 +1,51 @@
+id = "herdr-stockpulse"
+name = "herdr-stockpulse"
+version = "0.1.0"
+min_herdr_version = "0.9.0"
+platforms = ["windows", "linux", "macos"]
+description = "Live stock prices with clear up/down trend indicators"
+
+# herdr action IDs must be unique across platform-specific declarations.
+# Windows uses `python`; Linux and macOS use `python3`.
+
+[[actions]]
+id = "quote"
+title = "StockPulse: refresh configured quotes"
+platforms = ["linux", "macos"]
+contexts = ["global", "pane", "workspace"]
+command = ["python3", "-X", "utf8", "src/stockpulse.py", "quote"]
+
+[[actions]]
+id = "open"
+title = "StockPulse: open dashboard"
+platforms = ["linux", "macos"]
+contexts = ["global", "pane", "workspace"]
+command = ["python3", "-X", "utf8", "src/stockpulse.py", "panel"]
+
+[[panes]]
+id = "dashboard"
+title = "StockPulse"
+platforms = ["linux", "macos"]
+placement = "split"
+command = ["python3", "-X", "utf8", "src/panel.py"]
+
+[[actions]]
+id = "quote-windows"
+title = "StockPulse: refresh configured quotes"
+platforms = ["windows"]
+contexts = ["global", "pane", "workspace"]
+command = ["python", "-X", "utf8", "src/stockpulse.py", "quote"]
+
+[[actions]]
+id = "open-windows"
+title = "StockPulse: open dashboard"
+platforms = ["windows"]
+contexts = ["global", "pane", "workspace"]
+command = ["python", "-X", "utf8", "src/stockpulse.py", "panel"]
+
+[[panes]]
+id = "dashboard-windows"
+title = "StockPulse"
+platforms = ["windows"]
+placement = "split"
+command = ["python", "-X", "utf8", "src/panel.py"]
