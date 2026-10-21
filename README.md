@@ -8,7 +8,32 @@ Show live stock prices and daily trends in a herdr dashboard and the Agents side
 
 ## Dashboard design
 
-The dashboard shows configured symbols, prices, timestamps, and colored `▲`/`▼` daily trends. It refreshes every 60 seconds.
+Agents sidebar:
+
+```text
+ ● Apple Inc.
+   ▲ $189.84 +1.24%
+ ● Microsoft
+   ▼ $420.72 -0.36%
+```
+
+Dashboard:
+
+```text
+╭──────────────────────────────────────────────────────────────╮
+│                  🐺  herdr-stockpulse  🌕                   │
+├──────────────────────────────────────────────────────────────┤
+│ AAPL (Apple Inc.)                                            │
+│   189.84 USD  ▲ +2.31 (+1.23%)                               │
+│   2025-03-08 15:30 UTC                                       │
+├──────────────────────────────────────────────────────────────┤
+│ MSFT (Microsoft Corporation)                                 │
+│   420.72 USD  ▼ -1.52 (-0.36%)                               │
+│   2025-03-08 15:30 UTC                                       │
+├──────────────────────────────────────────────────────────────┤
+│ Yahoo Finance   Refreshes every 60 seconds   Ctrl+C to close │
+╰──────────────────────────────────────────────────────────────╯
+```
 
 ## Installation
 
