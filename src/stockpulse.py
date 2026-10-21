@@ -11,6 +11,7 @@ import sys
 from typing import Any, Optional
 
 from quotes import QuoteError, fetch_quote
+from i18n import t
 from render import format_quote
 
 PLUGIN_ID = "herdr-stockpulse"
@@ -35,19 +36,19 @@ def read_config(path: Path) -> dict[str, Any]:
     try:
         loaded = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as error:
-        raise ValueError(f"Cannot read configuration {path}: {error}") from error
+        raise ValueError(t("config.read_error", path=path, error=error)) from error
     if not isinstance(loaded, dict):
-        raise ValueError(f"Configuration {path} must contain a JSON object")
+        raise ValueError(t("config.not_object", path=path))
     return loaded
 
 
 def symbols_from(config: dict[str, Any], supplied: list[str]) -> list[str]:
     values = supplied or config.get("symbols", [])
     if not isinstance(values, list) or not all(isinstance(symbol, str) and symbol.strip() for symbol in values):
-        raise ValueError('"symbols" must be a non-empty array of stock symbols')
+        raise ValueError(t("config.bad_symbols"))
     symbols = [symbol.strip().upper() for symbol in values]
     if not symbols:
-        raise ValueError("Provide at least one symbol or configure \"symbols\"")
+        raise ValueError(t("config.no_symbols"))
     return symbols
 
 
@@ -60,7 +61,7 @@ def run_quote(symbols: list[str], itick_token: str) -> int:
             print(format_quote(fetch_quote(symbol, itick_token)))
         except QuoteError as error:
             failures += 1
-            print(f"{symbol}\n  Error: {error}", file=sys.stderr)
+            print(f"{symbol}\n  {t('quote.error', error=error)}", file=sys.stderr)
     return 1 if failures else 0
 
 
@@ -98,7 +99,7 @@ def dock_anchor() -> str:
     panes = [p for p in herdr_cli("pane", "list").get("panes", []) if p["workspace_id"] == dock]
     candidates = [p["pane_id"] for p in panes if not is_sidebar(p)]
     if not candidates:
-        raise RuntimeError(f"workspace {dock} has no pane")
+        raise RuntimeError(t("dock.no_pane", workspace=dock))
     return candidates[-1]
 
 

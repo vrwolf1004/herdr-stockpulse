@@ -11,6 +11,7 @@ import unicodedata
 
 import herdr_api
 from quotes import QuoteError, fetch_quote
+from i18n import t
 from render import format_quote, sidebar_quote_tokens, trend_label
 from stockpulse import config_path, read_config, symbols_from
 
@@ -83,13 +84,13 @@ def dashboard(symbols, itick_token):
         results = list(pool.map(lambda symbol: _fetch_or_error(symbol, itick_token), symbols))
     for symbol, result in zip(symbols, results):
         if isinstance(result, QuoteError):
-            sections.append([_style(symbol, "1;97"), _style(f"  Error: {result}", "31")])
+            sections.append([_style(symbol, "1;97"), _style(f"  {t('quote.error', error=result)}", "31")])
         else:
             quotes.append(result)
             sections.append(quote_lines(result))
     sources = sorted({quote.source for quote in quotes})
-    footer = f"Source: {' · '.join(sources)}   " if sources else ""
-    sections.append([footer + f"Refreshes {REFRESH_SECONDS} s   " + _style("[Ctrl+C] close", "2")])
+    footer = f"{t('panel.source', sources=' · '.join(sources))}   " if sources else ""
+    sections.append([footer + t("panel.refresh", seconds=REFRESH_SECONDS) + "   " + _style(t("panel.close"), "2")])
     return box(sections), sidebar_quote_tokens(quotes)
 
 
@@ -129,10 +130,11 @@ def main():
                 contents, sidebar_value = render_once(args.config)
                 report_sidebar(args.pane, sidebar_value)
             except ValueError as error:
-                contents = box([[f"Configuration error: {error}"], [_style("[Ctrl+C] close", "2")]])
+                contents = box([[t("panel.config_error", error=error)], [_style(t("panel.close"), "2")]])
                 report_sidebar(args.pane, {})  # clear quotes from the last good refresh instead of letting them linger until TTL
             except Exception as error:  # noqa: BLE001 - keep the docked pane alive; retry next round
-                contents = box([[f"Refresh failed: {type(error).__name__}: {error}"], [f"Retrying in {REFRESH_SECONDS}s   " + _style("[Ctrl+C] close", "2")]])
+                contents = box([[t("panel.refresh_failed", kind=type(error).__name__, error=error)],
+                                [t("panel.retrying", seconds=REFRESH_SECONDS) + "   " + _style(t("panel.close"), "2")]])
             print("\033[2J\033[H" + contents, flush=True)
             if args.once:
                 return 0

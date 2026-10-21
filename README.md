@@ -1,28 +1,50 @@
 # herdr-stockpulse
 
-Live stock prices with clear up/down trend indicators for herdr.
+[**English**](README.md) | [한국어](README.ko.md)
 
-Enter stock symbols such as `AAPL` or `005930.KS` to see the latest price,
-daily change, and a `▲`/`▼` trend indicator. The dashboard runs in the shared
-`herdr-dock` workspace and reports a compact summary through the Agents
-sidebar. Yahoo Finance is used by default without an API key; iTick is an
-optional fallback.
+🌐 UI languages: 🇺🇸 English (en) · 🇰🇷 한국어 (ko) · 🇷🇺 Русский (ru) · 🇫🇷 Français (fr) · 🇪🇸 Español (es) · 🇩🇪 Deutsch (de) · 🇯🇵 日本語 (ja)
+
+Show live stock prices and daily trends in a herdr dashboard and the Agents sidebar. Yahoo Finance is used by default; iTick is an optional fallback.
+
+## Dashboard design
+
+The dashboard shows configured symbols, prices, timestamps, and colored `▲`/`▼` daily trends. It refreshes every 60 seconds.
+
+## Installation
 
 ```sh
 herdr plugin install vrwolf1004/herdr-stockpulse
 ```
 
-See [Usage](docs/usage.md) for installation, configuration, the docked
-dashboard, and Agents sidebar setup. See [Architecture](docs/architecture.md)
-for provider and reporting behavior.
+## Actions
 
-The open action splits a pane below the current pane (or uses `herdr-dock` if
-there is no current pane) and runs a boxed dashboard with colored daily trends.
-Press `Ctrl+C` to stop it; the shell pane remains available, and the action can
-open the dashboard again.
+| Action | What it does |
+| --- | --- |
+| `open` | Open the stock dashboard |
+| `quote` | Refresh configured quotes once in the plugin command log |
+
+On Windows, append `-windows` to each action ID. See the [usage guide](docs/usage.md) to configure symbols and sidebar rows.
+
+## Requirements
+
+- Windows, Linux, or macOS
+- herdr 0.9.0 or later
+- Python 3.8 or later; standard library only
+
+## Documentation
+
+- [Usage and setup](docs/usage.md)
+- [Architecture](docs/architecture.md)
+- [TODO](docs/todo.md)
 
 ## Development
 
 ```sh
 python -m unittest discover -s tests
 ```
+
+## Support the project
+
+If this project is useful to you, consider buying the developer a coffee.
+
+[![Support on Ko-fi](https://img.shields.io/badge/Ko--fi-Support-FF5E5B?style=for-the-badge&logo=buymeacoffee&logoColor=white)](https://ko-fi.com/dev_ohyt)

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import unicodedata
 
+from i18n import t
 from quotes import Quote
 
 # herdr allows at most 16 Agents-sidebar rows. With the standard feedbag rows,
@@ -28,10 +29,11 @@ def format_quote(quote: Quote) -> str:
     title = f"{quote.symbol} ({quote.name})" if quote.name else quote.symbol
     price = f"{quote.price:,.2f}{currency}"
     if quote.change is None or quote.change_percent is None:
-        change = "change unavailable"
+        change = t("quote.change_unavailable")
     else:
         change = f"{trend_label(quote)} {quote.change:+,.2f} ({quote.change_percent:+.2f}%)"
-    return f"{title}\n  {price}  {change}\n  Source: {quote.source} · Updated: {quote.updated_at:%Y-%m-%d %H:%M UTC}"
+    updated = f"{quote.updated_at:%Y-%m-%d %H:%M UTC}"
+    return f"{title}\n  {price}  {change}\n  {t('quote.source_updated', source=quote.source, time=updated)}"
 
 
 def _display_width(value: str) -> int:
@@ -63,5 +65,5 @@ def sidebar_quote_tokens(quotes: list[Quote]) -> dict[str, str]:
         tokens[f"sp_quote_{index}_price"] = value
     remaining = len(quotes) - MAX_SIDEBAR_QUOTES
     if remaining > 0:
-        tokens["sp_quote_more"] = f"+{remaining} more symbols"
+        tokens["sp_quote_more"] = t("quote.more_symbols", count=remaining)
     return tokens

@@ -15,6 +15,8 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import quote as url_quote
 from urllib.request import Request, urlopen
 
+from i18n import t
+
 YAHOO_CHART_URL = "https://query1.finance.yahoo.com/v8/finance/chart/{symbol}?interval=1d&range=1d"
 ITICK_TICK_URL = "https://api.itick.org/stock/tick?region={region}&code={code}"
 REQUEST_TIMEOUT_SECONDS = 10
@@ -99,7 +101,7 @@ def fetch_yahoo(symbol: str, get_json: Callable[..., dict[str, Any]] = _get_json
     meta = results[0].get("meta") or {}
     price = _as_float(meta.get("regularMarketPrice"))
     if price is None:
-        raise QuoteError(f"Yahoo Finance returned no market price for {symbol}")
+        raise QuoteError(t("quote.no_price_yahoo", symbol=symbol))
 
     timestamp = _as_float(meta.get("regularMarketTime"))
     updated_at = datetime.fromtimestamp(timestamp, tz=timezone.utc) if timestamp else datetime.now(timezone.utc)
@@ -131,7 +133,7 @@ def fetch_itick(symbol: str, token: str, get_json: Callable[..., dict[str, Any]]
     tick = payload.get("data") or payload
     price = _as_float(tick.get("ld") if isinstance(tick, dict) else None)
     if price is None:
-        raise QuoteError(f"iTick returned no market price for {symbol}")
+        raise QuoteError(t("quote.no_price_itick", symbol=symbol))
     return Quote(
         symbol=symbol.upper(),
         price=price,
@@ -149,10 +151,10 @@ def fetch_quote(symbol: str, itick_token: str = "") -> Quote:
         return fetch_yahoo(symbol)
     except QuoteError as yahoo_error:
         if not itick_token:
-            raise QuoteError(f"{symbol}: Yahoo Finance failed: {yahoo_error}") from yahoo_error
+            raise QuoteError(t("quote.yahoo_failed", symbol=symbol, yahoo_error=yahoo_error)) from yahoo_error
         try:
             return fetch_itick(symbol, itick_token)
         except QuoteError as itick_error:
             raise QuoteError(
-                f"{symbol}: Yahoo Finance failed: {yahoo_error}; iTick fallback failed: {itick_error}"
+                t("quote.both_failed", symbol=symbol, yahoo_error=yahoo_error, itick_error=itick_error)
             ) from itick_error

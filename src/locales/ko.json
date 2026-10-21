@@ -1,0 +1,21 @@
+{
+  "panel.source": "출처: {sources}",
+  "panel.refresh": "{seconds}초마다 갱신",
+  "panel.close": "[Ctrl+C] 닫기",
+  "panel.config_error": "설정 오류: {error}",
+  "panel.refresh_failed": "갱신 실패: {kind}: {error}",
+  "panel.retrying": "{seconds}초 뒤에 다시 시도합니다",
+  "quote.change_unavailable": "등락 정보 없음",
+  "quote.more_symbols": "+{count}개 더",
+  "quote.source_updated": "출처: {source} · 갱신: {time}",
+  "quote.no_price_yahoo": "Yahoo Finance에서 {symbol}의 시세를 받지 못했습니다",
+  "quote.no_price_itick": "iTick에서 {symbol}의 시세를 받지 못했습니다",
+  "config.read_error": "설정 {path}을(를) 읽을 수 없습니다: {error}",
+  "config.not_object": "설정 {path}은(는) JSON 객체여야 합니다",
+  "config.no_symbols": "종목을 하나 이상 넣거나 config.json 의 \"symbols\" 를 설정하세요",
+  "config.bad_symbols": "\"symbols\" 는 종목 코드가 담긴 비어 있지 않은 배열이어야 합니다",
+  "dock.no_pane": "workspace {workspace} 에 pane 이 없습니다",
+  "quote.error": "오류: {error}",
+  "quote.yahoo_failed": "{symbol}: Yahoo Finance 실패: {yahoo_error}",
+  "quote.both_failed": "{symbol}: Yahoo Finance 실패: {yahoo_error}; iTick 대체 조회도 실패: {itick_error}"
+}

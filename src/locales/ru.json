@@ -1,0 +1,21 @@
+{
+  "panel.source": "Источник: {sources}",
+  "panel.refresh": "Обновление каждые {seconds} с",
+  "panel.close": "[Ctrl+C] закрыть",
+  "panel.config_error": "Ошибка конфигурации: {error}",
+  "panel.refresh_failed": "Сбой обновления: {kind}: {error}",
+  "panel.retrying": "Повтор через {seconds} с",
+  "quote.change_unavailable": "изменение недоступно",
+  "quote.more_symbols": "ещё символов: {count}",
+  "quote.source_updated": "Источник: {source} · Обновлено: {time}",
+  "quote.no_price_yahoo": "Yahoo Finance не вернул рыночную цену для {symbol}",
+  "quote.no_price_itick": "iTick не вернул рыночную цену для {symbol}",
+  "config.read_error": "Не удалось прочитать конфигурацию {path}: {error}",
+  "config.not_object": "Конфигурация {path} должна быть JSON-объектом",
+  "config.no_symbols": "Укажите хотя бы один символ или задайте \"symbols\" в конфигурации",
+  "config.bad_symbols": "\"symbols\" должен быть непустым массивом кодов акций",
+  "dock.no_pane": "в workspace {workspace} нет pane",
+  "quote.error": "Ошибка: {error}",
+  "quote.yahoo_failed": "{symbol}: Yahoo Finance не сработал: {yahoo_error}",
+  "quote.both_failed": "{symbol}: Yahoo Finance не сработал: {yahoo_error}; резервный iTick тоже не сработал: {itick_error}"
+}

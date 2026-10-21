@@ -1,0 +1,21 @@
+{
+  "panel.source": "出典: {sources}",
+  "panel.refresh": "{seconds}秒ごとに更新",
+  "panel.close": "[Ctrl+C] 閉じる",
+  "panel.config_error": "設定エラー: {error}",
+  "panel.refresh_failed": "更新に失敗しました: {kind}: {error}",
+  "panel.retrying": "{seconds}秒後に再試行します",
+  "quote.change_unavailable": "変動情報なし",
+  "quote.more_symbols": "ほか{count}件",
+  "quote.source_updated": "出典: {source} · 更新: {time}",
+  "quote.no_price_yahoo": "Yahoo Financeから {symbol} の株価を取得できませんでした",
+  "quote.no_price_itick": "iTickから {symbol} の株価を取得できませんでした",
+  "config.read_error": "設定 {path} を読み込めません: {error}",
+  "config.not_object": "設定 {path} はJSONオブジェクトである必要があります",
+  "config.no_symbols": "銘柄を1つ以上指定するか、\"symbols\" を設定してください",
+  "config.bad_symbols": "\"symbols\" は銘柄コードの空でない配列である必要があります",
+  "dock.no_pane": "workspace {workspace} に pane がありません",
+  "quote.error": "エラー: {error}",
+  "quote.yahoo_failed": "{symbol}: Yahoo Financeに失敗しました: {yahoo_error}",
+  "quote.both_failed": "{symbol}: Yahoo Financeに失敗しました: {yahoo_error}; iTickへの代替も失敗しました: {itick_error}"
+}

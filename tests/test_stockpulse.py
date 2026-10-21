@@ -1,9 +1,11 @@
 from pathlib import Path
 import json
+import os
 import sys
 import tempfile
 import unittest
 
+os.environ["HERDR_STOCKPULSE_LANG"] = "en"  # 테스트의 기대 문구는 영어 기준이다. i18n 을 읽기 전에 고정한다.
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 from stockpulse import read_config, symbols_from

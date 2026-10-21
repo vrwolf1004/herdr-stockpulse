@@ -1,0 +1,21 @@
+{
+  "panel.source": "Source : {sources}",
+  "panel.refresh": "Actualisation toutes les {seconds} s",
+  "panel.close": "[Ctrl+C] fermer",
+  "panel.config_error": "Erreur de configuration : {error}",
+  "panel.refresh_failed": "Échec de l'actualisation : {kind} : {error}",
+  "panel.retrying": "Nouvelle tentative dans {seconds} s",
+  "quote.change_unavailable": "variation indisponible",
+  "quote.more_symbols": "+{count} autres symboles",
+  "quote.source_updated": "Source : {source} · Mis à jour : {time}",
+  "quote.no_price_yahoo": "Yahoo Finance n'a pas renvoyé de cours pour {symbol}",
+  "quote.no_price_itick": "iTick n'a pas renvoyé de cours pour {symbol}",
+  "config.read_error": "Impossible de lire la configuration {path} : {error}",
+  "config.not_object": "La configuration {path} doit contenir un objet JSON",
+  "config.no_symbols": "Indiquez au moins un symbole ou configurez \"symbols\"",
+  "config.bad_symbols": "\"symbols\" doit être un tableau non vide de codes boursiers",
+  "dock.no_pane": "le workspace {workspace} n'a pas de pane",
+  "quote.error": "Erreur : {error}",
+  "quote.yahoo_failed": "{symbol} : échec de Yahoo Finance : {yahoo_error}",
+  "quote.both_failed": "{symbol} : échec de Yahoo Finance : {yahoo_error} ; échec du repli iTick : {itick_error}"
+}

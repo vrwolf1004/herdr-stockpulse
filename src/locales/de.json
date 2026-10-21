@@ -1,0 +1,21 @@
+{
+  "panel.source": "Quelle: {sources}",
+  "panel.refresh": "Aktualisierung alle {seconds} s",
+  "panel.close": "[Ctrl+C] schließen",
+  "panel.config_error": "Konfigurationsfehler: {error}",
+  "panel.refresh_failed": "Aktualisierung fehlgeschlagen: {kind}: {error}",
+  "panel.retrying": "Neuer Versuch in {seconds} s",
+  "quote.change_unavailable": "Änderung nicht verfügbar",
+  "quote.more_symbols": "{count} weitere Symbole",
+  "quote.source_updated": "Quelle: {source} · Aktualisiert: {time}",
+  "quote.no_price_yahoo": "Yahoo Finance hat keinen Börsenkurs für {symbol} geliefert",
+  "quote.no_price_itick": "iTick hat keinen Börsenkurs für {symbol} geliefert",
+  "config.read_error": "Konfiguration {path} kann nicht gelesen werden: {error}",
+  "config.not_object": "Konfiguration {path} muss ein JSON-Objekt enthalten",
+  "config.no_symbols": "Mindestens ein Symbol angeben oder \"symbols\" konfigurieren",
+  "config.bad_symbols": "\"symbols\" muss ein nicht leeres Array von Börsenkürzeln sein",
+  "dock.no_pane": "Workspace {workspace} hat kein pane",
+  "quote.error": "Fehler: {error}",
+  "quote.yahoo_failed": "{symbol}: Yahoo Finance fehlgeschlagen: {yahoo_error}",
+  "quote.both_failed": "{symbol}: Yahoo Finance fehlgeschlagen: {yahoo_error}; iTick-Ersatz ebenfalls fehlgeschlagen: {itick_error}"
+}
