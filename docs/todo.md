@@ -38,6 +38,10 @@
   - 처리: 429·5xx·네트워크 오류(`TransientQuoteError`)에 한해 1초 뒤 한 번 재시도한다. 영구 오류(404 등)는 재시도하지 않는다.
   - 캐시는 넣지 않았다. 패널이 60초마다 갱신하므로 캐시 이득이 거의 없다고 판단했다.
 
+- [x] **도크를 맨 아래에 유지하지 않음** (`src/panel.py` `keep_at_bottom`)
+  - 처리: 패널이 갱신할 때마다 도크 workspace를 목록 맨 아래로 옮긴다. radio·timekit·simple-git과 같은 규칙이다. `KeepAtBottomTest`로 확인했다.
+  - 확인 필요: 실제 herdr에서 다른 workspace가 뒤에 있을 때 맨 아래로 돌아오는지는 아직 실행으로 보지 않았다.
+
 ## 낮음
 
 - [x] **`open` 액션의 중복 실행 경쟁** (짧은 락 파일 `_open_lock`. 락이 살아 있으면 두 번째 실행은 아무것도 열지 않음. `OpenLockTest`) (`src/stockpulse.py` `open_dashboard`)

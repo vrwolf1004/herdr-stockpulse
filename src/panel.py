@@ -18,6 +18,7 @@ from stockpulse import config_path, read_config, symbols_from
 PLUGIN_ID = "herdr-stockpulse"
 SOURCE = f"plugin:{PLUGIN_ID}"
 AGENT_ID = "stockpulse"
+DOCK_LABEL = "herdr-dock"  # 공용 도크 workspace. 맨 아래에 있어야 사이드바 블록이 위로 밀리지 않는다
 TOKEN_TTL_MS = 90_000
 REFRESH_SECONDS = 60
 MAX_PARALLEL_REQUESTS = 8
@@ -100,6 +101,19 @@ def render_once(explicit_config):
     return dashboard(symbols, str(config.get("itick_token", "")))
 
 
+def keep_at_bottom():
+    """도크 workspace 를 목록 맨 아래로 옮긴다. 다른 블록이 없어도 도크가 위로 밀리지 않게 한다 (radio·timekit 과 같은 규칙)."""
+    try:
+        workspaces = herdr_api.request("workspace.list", {}).get("workspaces", [])
+    except (herdr_api.HerdrError, ValueError):
+        return
+    ids = [w["workspace_id"] for w in workspaces]
+    dock = next((w["workspace_id"] for w in workspaces if w.get("label") == DOCK_LABEL), None)
+    if dock is None or not ids or ids[-1] == dock:
+        return
+    herdr_api.try_request("workspace.move", {"workspace_id": dock, "insert_index": len(ids)})
+
+
 def report_sidebar(pane_id, tokens):
     if not pane_id:
         return
@@ -130,6 +144,7 @@ def main():
             try:
                 contents, sidebar_value = render_once(args.config)
                 report_sidebar(args.pane, sidebar_value)
+                keep_at_bottom()
             except ValueError as error:
                 contents = box([[t("panel.config_error", error=error)], [_style(t("panel.close"), "2")]])
                 report_sidebar(args.pane, {})  # clear quotes from the last good refresh instead of letting them linger until TTL

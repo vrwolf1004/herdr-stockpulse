@@ -68,5 +68,30 @@ class RefreshScheduleTest(unittest.TestCase):
         self.assertEqual(sleeps, [panel.REFRESH_SECONDS - 20.0])
 
 
+class KeepAtBottomTest(unittest.TestCase):
+    def run_with(self, workspaces):
+        with mock.patch.object(panel.herdr_api, "request", return_value={"workspaces": workspaces}),                 mock.patch.object(panel.herdr_api, "try_request") as try_request:
+            panel.keep_at_bottom()
+        return try_request
+
+    def test_moves_dock_to_the_end_when_it_is_not_last(self):
+        try_request = self.run_with([
+            {"workspace_id": "wM", "label": panel.DOCK_LABEL},
+            {"workspace_id": "w4", "label": "app"},
+        ])
+        try_request.assert_called_once_with("workspace.move", {"workspace_id": "wM", "insert_index": 2})
+
+    def test_does_nothing_when_dock_is_already_last(self):
+        try_request = self.run_with([
+            {"workspace_id": "w4", "label": "app"},
+            {"workspace_id": "wM", "label": panel.DOCK_LABEL},
+        ])
+        try_request.assert_not_called()
+
+    def test_does_nothing_without_dock(self):
+        try_request = self.run_with([{"workspace_id": "w4", "label": "app"}])
+        try_request.assert_not_called()
+
+
 if __name__ == "__main__":
     unittest.main()
