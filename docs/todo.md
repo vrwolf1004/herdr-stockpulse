@@ -4,6 +4,11 @@
 
 ## 높음
 
+- [ ] **공급자 응답 구조 검증**
+  - Yahoo 응답의 중첩 필드가 없거나 예상 형식이 아니면 `IndexError`/`AttributeError`가 발생할 수 있다. 명확한 공급자 오류로 변환하고 부분·잘못된 JSON 테스트를 보강한다.
+- [ ] **60초 갱신 간격을 요청 시간 포함 기준으로 유지**
+  - 현재 렌더 이후 60초를 더 기다리므로 요청 시간이 주기만큼 추가된다. monotonic deadline 기준으로 다음 갱신을 예약하고 느린 요청 테스트를 추가한다.
+
 - [x] **Windows named pipe 읽기에 타임아웃이 없음** (`src/herdr_api.py` `_exchange_pipe`)
   - Unix 소켓에만 `SOCKET_TIMEOUT_SECONDS`가 적용되어, herdr가 응답하지 않으면 패널 루프가 멈출 수 있다.
   - 개선: 오버랩 I/O 또는 별도 스레드 + join 타임아웃으로 상한을 둔다.
