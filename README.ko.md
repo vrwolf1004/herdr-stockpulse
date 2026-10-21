@@ -2,7 +2,7 @@
 
 [English](README.md) | [**한국어**](README.ko.md)
 
-🌐 UI 언어: 🇺🇸 English (en) · 🇰🇷 한국어 (ko) · 🇷🇺 Русский (ru) · 🇫🇷 Français (fr) · 🇪🇸 Español (es) · 🇩🇪 Deutsch (de) · 🇯🇵 日本語 (ja)
+지원 언어: 영어 · 한국어 · 러시아어 · 프랑스어 · 스페인어 · 독일어 · 일본어
 
 herdr 대시보드와 Agents 사이드바에서 주식 현재가와 전일 대비 추세를 보여 줍니다. 기본 제공자는 Yahoo Finance이며 iTick은 선택형 대체 제공자입니다.
 
