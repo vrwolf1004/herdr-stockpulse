@@ -37,6 +37,8 @@ Agents 사이드바:
 
 상승 `▲`은 초록색, 하락 `▼`은 빨간색으로 표시하고 60초마다 갱신합니다.
 
+위 가격과 시각은 화면 예시이며, 실제 대시보드에는 설정한 종목의 최신 시세가 표시됩니다.
+
 ## 설치
 
 ```sh
@@ -50,7 +52,7 @@ herdr plugin install vrwolf1004/herdr-stockpulse
 | `open` | 주식 대시보드 열기 |
 | `quote` | 설정한 종목 시세를 플러그인 명령 로그에서 한 번 갱신 |
 
-Windows에서는 각 액션 ID 뒤에 `-windows`를 붙입니다. 종목과 사이드바 줄 설정은 [사용법](docs/usage.md)을 참고하세요 (영문).
+Windows에서는 각 액션 ID 뒤에 `-windows`를 붙입니다. 종목과 사이드바 줄 설정은 [사용법](docs/usage.ko.md)을 참고하세요.
 
 ## 요구 사항
 
@@ -60,7 +62,8 @@ Windows에서는 각 액션 ID 뒤에 `-windows`를 붙입니다. 종목과 사�
 
 ## 문서
 
-- [사용법 (영문)](docs/usage.md)
+- [사용법](docs/usage.ko.md)
+- [Usage (English)](docs/usage.md)
 - [구조 (영문)](docs/architecture.md)
 - [TODO (영문)](docs/todo.md)
 

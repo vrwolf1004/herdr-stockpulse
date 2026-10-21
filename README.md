@@ -35,6 +35,9 @@ Dashboard:
 ╰──────────────────────────────────────────────────────────────╯
 ```
 
+The values and timestamp above are illustrative; the dashboard shows the
+configured symbols and their latest provider data.
+
 ## Installation
 
 ```sh

@@ -1,16 +1,16 @@
 # Architecture
 
 `herdr-stockpulse` is a small Python plugin with no third-party dependencies.
-The `open` action ensures a single `stockpulse` agent is running, then splits a
-dashboard pane below the current pane. If there is no current pane, it finds or
-creates the shared `herdr-dock` workspace and splits from one of its
-non-sidebar panes. The dashboard reads configured symbols, requests their
-current prices, renders a boxed, colored view, and refreshes every 60 seconds.
+The `open` action ensures a single `stockpulse` agent is running, then opens the
+dashboard in the shared `herdr-dock` workspace, regardless of the current
+pane. It reuses a free non-sidebar dock pane or creates a pane in the dock's
+2×2 layout. The dashboard reads configured symbols, requests their current
+prices, renders a boxed, colored view, and refreshes every 60 seconds.
 
 ```text
 herdr open action
   -> src/stockpulse.py
-       -> use current pane, or find/create herdr-dock when no pane is available
+       -> find/create herdr-dock and reuse a free pane or create a grid pane
        -> do nothing when the stockpulse agent already exists
        -> pane.split + pane.run
             -> src/panel.py
@@ -26,10 +26,9 @@ herdr open action
 
 ## herdr docking and reporting
 
-When invoked from a pane, the action splits the dashboard below that pane (so
-it shares the dock only when that pane belongs to `herdr-dock`). If there is no
-current pane, it finds or creates `herdr-dock` and splits below its last
-non-sidebar pane. The dashboard command runs in the new pane's shell;
+The action always finds or creates `herdr-dock`, reusing a free pane or
+splitting the dock's 2×2 layout. The current pane does not affect placement.
+The dashboard command runs in the selected pane's shell;
 Ctrl+C stops the command, releases the agent registration, and returns to the
 shell prompt without closing the pane.
 
@@ -39,7 +38,7 @@ The dashboard uses herdr's socket API to:
 2. Report one `$sp_quote_N` token for each visible quote with a 90-second TTL.
 3. Release the agent registration when the dashboard stops.
 
-The first five quotes in configured order are reported as two rows each:
+The first five successful quotes in configured order are reported as two rows each:
 `$sp_quote_N_name` contains the company name and `$sp_quote_N_price` contains
 the trend marker, currency, price, and daily percentage. Long names are
 shortened; the symbol is used only when a provider has no company name. Any
