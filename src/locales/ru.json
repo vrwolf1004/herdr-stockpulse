@@ -17,5 +17,6 @@
   "dock.no_pane": "в workspace {workspace} нет pane",
   "quote.error": "Ошибка: {error}",
   "quote.yahoo_failed": "{symbol}: Yahoo Finance не сработал: {yahoo_error}",
-  "quote.both_failed": "{symbol}: Yahoo Finance не сработал: {yahoo_error}; резервный iTick тоже не сработал: {itick_error}"
+  "quote.both_failed": "{symbol}: Yahoo Finance не сработал: {yahoo_error}; резервный iTick тоже не сработал: {itick_error}",
+  "quote.bad_response": "{symbol}: неожиданный ответ Yahoo Finance"
 }

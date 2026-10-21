@@ -4,9 +4,9 @@
 
 ## 높음
 
-- [ ] **공급자 응답 구조 검증**
+- [x] **공급자 응답 구조 검증** (`quotes.py`: 단계마다 딕셔너리 확인, 예상과 다르면 QuoteError. `tests/test_quotes.py`의 MalformedYahooResponseTest)
   - Yahoo 응답의 중첩 필드가 없거나 예상 형식이 아니면 `IndexError`/`AttributeError`가 발생할 수 있다. 명확한 공급자 오류로 변환하고 부분·잘못된 JSON 테스트를 보강한다.
-- [ ] **60초 갱신 간격을 요청 시간 포함 기준으로 유지**
+- [x] **60초 갱신 간격을 요청 시간 포함 기준으로 유지** (`panel.py`: 주기 시작 시각을 기준으로 대기 시간을 계산. `RefreshScheduleTest`)
   - 현재 렌더 이후 60초를 더 기다리므로 요청 시간이 주기만큼 추가된다. monotonic deadline 기준으로 다음 갱신을 예약하고 느린 요청 테스트를 추가한다.
 
 - [x] **Windows named pipe 읽기에 타임아웃이 없음** (`src/herdr_api.py` `_exchange_pipe`)
@@ -30,7 +30,7 @@
 - [x] **Python 3.8 지원 주장 검증** (`docs/usage.md`)
   - 문서에 3.8 이상을 명시했으나 실제 실행 확인은 3.12(`__pycache__`)만 보인다.
   - 처리: `uv python install 3.8`(3.8.20)로 로컬에서 전체 테스트를 통과했다. 3.12에서도 통과했다.
-- [ ] **CI 없음** — 워크플로 추가 완료, 푸시 후 실제 실행 결과 확인 필요
+- [x] **CI 없음** — 워크플로 실행 결과 `success` 확인 (GitHub Actions `test`, 커밋 c7b1983)
   - 처리: `.github/workflows/test.yml`에 Windows/Linux/macOS × Python 3.8/3.12 매트릭스를 추가했다.
 - [x] **Yahoo Finance 비공식 엔드포인트 의존에 대한 대응** (`src/quotes.py`)
   - 공식 API가 아니어서 차단이나 응답 형식 변경에 취약하다.
@@ -40,13 +40,13 @@
 
 ## 낮음
 
-- [ ] **`open` 액션의 중복 실행 경쟁** (`src/stockpulse.py` `open_dashboard`)
+- [x] **`open` 액션의 중복 실행 경쟁** (짧은 락 파일 `_open_lock`. 락이 살아 있으면 두 번째 실행은 아무것도 열지 않음. `OpenLockTest`) (`src/stockpulse.py` `open_dashboard`)
   - 에이전트 존재 확인과 패널 생성 사이에 간격이 있어, 연속 실행 시 패널이 두 번 열릴 수 있다.
-- [ ] **Windows 소켓 경로 기본값 확인** (`src/herdr_api.py` `socket_path`)
+- [x] **Windows 소켓 경로 기본값 확인** (`APPDATA`가 없으면 빈 경로 대신 명확한 OSError. 다른 플러그인의 `herdr_api.py` 복사본도 같이 고침) (`src/herdr_api.py` `socket_path`)
   - `APPDATA` 미설정 시 빈 경로로 연결을 시도한다. 누락 시 명확한 오류를 내도록 한다.
-- [ ] **`_exchange_pipe` 핸들 누수 가능성** (`src/herdr_api.py`)
+- [x] **`_exchange_pipe` 핸들 누수 가능성** (`os.fdopen` 실패 시 descriptor를 닫음. radio, feedbag, timekit, simple-git 복사본도 같이 고침) (`src/herdr_api.py`)
   - `os.fdopen` 실패 경로에서 핸들이 닫히지 않을 수 있다. `try/finally`로 정리한다.
-- [ ] **`dashboard` 예외 처리 범위** (`src/panel.py` `main`)
+- [x] **`dashboard` 예외 처리 범위** (결정: 패널이 죽지 않도록 넓게 잡고 메시지에 예외 종류를 표시한다. 설정 오류는 별도 메시지로 나눈다.) (`src/panel.py` `main`)
   - `except Exception`으로 전부 삼키고 있다. 재시도 가능한 오류와 설정 오류를 더 명확히 나눈다.
 - [ ] **문서 정리** (`docs/usage.md`)
   - "Reopen after Ctrl+C" 절의 설명이 장황하다. 명령 예시를 먼저 두고 주의 사항을 뒤에 적는다.

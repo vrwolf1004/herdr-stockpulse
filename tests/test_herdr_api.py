@@ -64,5 +64,18 @@ class RequestTests(unittest.TestCase):
             self.assertTrue(try_request("pane.report_agent", {}))
 
 
+class SocketPathTest(unittest.TestCase):
+    def test_windows_without_appdata_fails_clearly(self):
+        import os
+        with mock.patch.object(herdr_api, "IS_WINDOWS", True),                 mock.patch.dict(os.environ, {}, clear=True):
+            with self.assertRaises(OSError):
+                herdr_api.socket_path()
+
+    def test_explicit_path_wins(self):
+        import os
+        with mock.patch.dict(os.environ, {"HERDR_SOCKET_PATH": "/tmp/x.sock"}):
+            self.assertEqual(herdr_api.socket_path(), "/tmp/x.sock")
+
+
 if __name__ == "__main__":
     unittest.main()

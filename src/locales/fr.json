@@ -17,5 +17,6 @@
   "dock.no_pane": "le workspace {workspace} n'a pas de pane",
   "quote.error": "Erreur : {error}",
   "quote.yahoo_failed": "{symbol} : échec de Yahoo Finance : {yahoo_error}",
-  "quote.both_failed": "{symbol} : échec de Yahoo Finance : {yahoo_error} ; échec du repli iTick : {itick_error}"
+  "quote.both_failed": "{symbol} : échec de Yahoo Finance : {yahoo_error} ; échec du repli iTick : {itick_error}",
+  "quote.bad_response": "{symbol} : réponse inattendue de Yahoo Finance"
 }

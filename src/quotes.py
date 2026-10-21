@@ -79,6 +79,11 @@ def _retry_once_when_transient(fetch: Callable[[], dict[str, Any]]) -> dict[str,
         return fetch()
 
 
+def _as_dict(value: Any) -> dict[str, Any]:
+    """딕셔너리면 그대로, 아니면 빈 딕셔너리. 예상과 다른 응답 구조를 AttributeError 없이 넘기기 위해 쓴다."""
+    return value if isinstance(value, dict) else {}
+
+
 def _as_float(value: Any) -> Optional[float]:
     if value is None:
         return None
@@ -92,13 +97,15 @@ def fetch_yahoo(symbol: str, get_json: Callable[..., dict[str, Any]] = _get_json
     """Fetch a quote from the Yahoo chart endpoint used by the Chrome extension."""
     url = YAHOO_CHART_URL.format(symbol=url_quote(symbol, safe=""))
     payload = _retry_once_when_transient(lambda: get_json(url))
-    chart = payload.get("chart") or {}
-    results = chart.get("result") or []
-    if not results:
-        message = (chart.get("error") or {}).get("description", "No quote data returned")
+    if not isinstance(payload, dict):
+        raise QuoteError(t("quote.bad_response", symbol=symbol))
+    chart = _as_dict(payload.get("chart"))
+    results = chart.get("result")
+    if not isinstance(results, list) or not results or not isinstance(results[0], dict):
+        message = _as_dict(chart.get("error")).get("description") or "No quote data returned"
         raise QuoteError(str(message))
 
-    meta = results[0].get("meta") or {}
+    meta = _as_dict(results[0].get("meta"))
     price = _as_float(meta.get("regularMarketPrice"))
     if price is None:
         raise QuoteError(t("quote.no_price_yahoo", symbol=symbol))

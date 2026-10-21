@@ -46,5 +46,27 @@ class ConfigErrorTests(unittest.TestCase):
         report.assert_called_once_with(None, {})
 
 
+class RefreshScheduleTest(unittest.TestCase):
+    def test_slow_render_shortens_the_wait_instead_of_adding_to_it(self):
+        clock = {"now": 100.0}
+        sleeps = []
+
+        def slow_render(_config):
+            clock["now"] += 20.0  # 요청이 20초 걸렸다
+            return "contents", {}
+
+        def fake_sleep(seconds):
+            sleeps.append(seconds)
+            raise KeyboardInterrupt  # 두 번째 바퀴로 가지 않도록 한 번만 돌린다
+
+        with mock.patch.object(panel, "render_once", side_effect=slow_render), \
+                mock.patch.object(panel.time, "monotonic", side_effect=lambda: clock["now"]), \
+                mock.patch.object(panel.time, "sleep", side_effect=fake_sleep), \
+                mock.patch.object(sys, "argv", ["stockpulse-panel"]), \
+                contextlib.redirect_stdout(io.StringIO()):
+            panel.main()
+        self.assertEqual(sleeps, [panel.REFRESH_SECONDS - 20.0])
+
+
 if __name__ == "__main__":
     unittest.main()

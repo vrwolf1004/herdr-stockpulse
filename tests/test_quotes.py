@@ -187,5 +187,28 @@ class DashboardTests(unittest.TestCase):
         self.assertEqual(tokens["sp_quote_2_name"], "CCC")
 
 
+class MalformedYahooResponseTest(unittest.TestCase):
+    """예상과 다른 구조는 AttributeError 대신 QuoteError 로 끝나야 한다."""
+
+    def check(self, payload):
+        with self.assertRaises(QuoteError):
+            fetch_yahoo("AAA", get_json=lambda url: payload)
+
+    def test_payload_not_an_object(self):
+        self.check(["not", "a", "dict"])
+
+    def test_chart_not_an_object(self):
+        self.check({"chart": "oops"})
+
+    def test_result_entry_not_an_object(self):
+        self.check({"chart": {"result": [None]}})
+
+    def test_meta_not_an_object(self):
+        self.check({"chart": {"result": [{"meta": ["x"]}]}})
+
+    def test_error_not_an_object_still_raises_quote_error(self):
+        self.check({"chart": {"result": None, "error": "bad"}})
+
+
 if __name__ == "__main__":
     unittest.main()

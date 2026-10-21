@@ -8,6 +8,9 @@ import os
 from pathlib import Path
 import subprocess
 import sys
+import tempfile
+import time
+from contextlib import contextmanager
 from typing import Any, Optional
 
 from quotes import QuoteError, fetch_quote
@@ -144,7 +147,43 @@ def ensure_intro(dock: str, new_pane: str) -> None:
     herdr_cli("pane", "run", pane_id, sys.executable, "-X", "utf8", INTRO_SCRIPT)
 
 
+OPEN_LOCK_SECONDS = 10  # 이 시간 안의 open 실행은 앞선 실행이 끝나기를 기다리지 않고 건너뛴다
+OPEN_LOCK_PATH = os.path.join(tempfile.gettempdir(), "herdr-stockpulse-open.lock")
+
+
+@contextmanager
+def _open_lock():
+    """연속으로 실행된 open 이 패널을 두 번 만들지 않도록 하는 짧은 락. 잡지 못하면 None 을 준다."""
+    try:
+        fd = os.open(OPEN_LOCK_PATH, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+    except FileExistsError:
+        try:
+            stale = time.time() - os.path.getmtime(OPEN_LOCK_PATH) > OPEN_LOCK_SECONDS
+        except OSError:
+            stale = True
+        if not stale:
+            yield False
+            return
+        os.remove(OPEN_LOCK_PATH)
+        fd = os.open(OPEN_LOCK_PATH, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+    os.close(fd)
+    try:
+        yield True
+    finally:
+        try:
+            os.remove(OPEN_LOCK_PATH)
+        except OSError:
+            pass
+
+
 def open_dashboard() -> int:
+    with _open_lock() as acquired:
+        if not acquired:
+            return 0  # 다른 open 이 진행 중이다
+        return _open_dashboard()
+
+
+def _open_dashboard() -> int:
     agents = herdr_cli("agent", "list").get("agents", [])
     if any(agent.get("agent") == AGENT_ID for agent in agents):
         return 0  # already docked

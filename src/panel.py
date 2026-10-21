@@ -126,6 +126,7 @@ def main():
     args = parser.parse_args()
     try:
         while True:
+            started = time.monotonic()  # 다음 갱신은 이 시각부터 REFRESH_SECONDS 뒤다 (요청 시간을 포함)
             try:
                 contents, sidebar_value = render_once(args.config)
                 report_sidebar(args.pane, sidebar_value)
@@ -138,7 +139,7 @@ def main():
             print("\033[2J\033[H" + contents, flush=True)
             if args.once:
                 return 0
-            time.sleep(REFRESH_SECONDS)
+            time.sleep(max(0.0, started + REFRESH_SECONDS - time.monotonic()))
     except KeyboardInterrupt:
         return 0  # Ctrl+C 로 멈춘 것이므로 트레이스백 없이 끝나고, pane 은 원래 셸로 돌아간다
     finally:

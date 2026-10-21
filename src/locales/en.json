@@ -17,5 +17,6 @@
   "dock.no_pane": "workspace {workspace} has no pane",
   "quote.error": "Error: {error}",
   "quote.yahoo_failed": "{symbol}: Yahoo Finance failed: {yahoo_error}",
-  "quote.both_failed": "{symbol}: Yahoo Finance failed: {yahoo_error}; iTick fallback failed: {itick_error}"
+  "quote.both_failed": "{symbol}: Yahoo Finance failed: {yahoo_error}; iTick fallback failed: {itick_error}",
+  "quote.bad_response": "{symbol}: unexpected response from Yahoo Finance"
 }

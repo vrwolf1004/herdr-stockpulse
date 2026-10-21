@@ -17,5 +17,6 @@
   "dock.no_pane": "workspace {workspace} 에 pane 이 없습니다",
   "quote.error": "오류: {error}",
   "quote.yahoo_failed": "{symbol}: Yahoo Finance 실패: {yahoo_error}",
-  "quote.both_failed": "{symbol}: Yahoo Finance 실패: {yahoo_error}; iTick 대체 조회도 실패: {itick_error}"
+  "quote.both_failed": "{symbol}: Yahoo Finance 실패: {yahoo_error}; iTick 대체 조회도 실패: {itick_error}",
+  "quote.bad_response": "{symbol}: Yahoo Finance 응답 형식이 예상과 다릅니다"
 }
