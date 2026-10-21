@@ -69,6 +69,8 @@ def run_quote(symbols: list[str], itick_token: str) -> int:
 DOCK_LABEL = "herdr-dock"
 AGENT_ID = "stockpulse"
 SIDEBAR_TOKEN_PREFIX = "herdr-sidebar"
+SRC_DIR = os.path.dirname(os.path.abspath(__file__))
+PANEL_PATH = os.path.join(SRC_DIR, "panel.py")
 
 
 def herdr_cli(*args: str) -> dict[str, Any]:
@@ -104,23 +106,16 @@ def open_dashboard() -> int:
     agents = herdr_cli("agent", "list").get("agents", [])
     if any(agent.get("agent") == AGENT_ID for agent in agents):
         return 0  # already docked
-    entrypoint = "dashboard-windows" if os.name == "nt" else "dashboard"
+    # 현재 pane 이 있으면 그 아래에 나눈 뒤, 새 pane 의 셸에 대시보드 명령을 입력한다 (ai-feedbag 과 같은 방식).
+    # 대시보드가 끝나면(Ctrl+C) 그 셸 프롬프트가 그대로 남는다.
     try:
-        anchor = dock_anchor()
+        anchor = os.environ.get("HERDR_PANE_ID") or dock_anchor()
+        pane_id = herdr_cli("pane", "split", anchor, "--direction", "down", "--cwd", SRC_DIR)["pane"]["pane_id"]
+        herdr_cli("pane", "run", pane_id, sys.executable, "-X", "utf8", PANEL_PATH, "--pane", pane_id)
     except (RuntimeError, ValueError, KeyError) as error:
         print(f"StockPulse: {error}", file=sys.stderr)
         return 1
-    command = [
-        os.environ.get("HERDR_BIN_PATH", "herdr"),
-        "plugin", "pane", "open",
-        "--plugin", PLUGIN_ID,
-        "--entrypoint", entrypoint,
-        "--placement", "split",
-        "--direction", "down",
-        "--target-pane", anchor,
-    ]
-    completed = subprocess.run(command, check=False)
-    return completed.returncode
+    return 0
 
 
 def main() -> int:

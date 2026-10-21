@@ -1,17 +1,18 @@
 # Architecture
 
 `herdr-stockpulse` is a small Python plugin with no third-party dependencies.
-The `open` action ensures a single `stockpulse` agent is running, then creates
-its split dashboard pane in the shared `herdr-dock` workspace. The pane reads
-configured symbols, requests their current prices, renders one block per
-symbol, and refreshes every 60 seconds.
+The `open` action ensures a single `stockpulse` agent is running, then splits a
+dashboard pane below the current pane. If there is no current pane, it finds or
+creates the shared `herdr-dock` workspace and splits from one of its
+non-sidebar panes. The dashboard reads configured symbols, requests their
+current prices, renders a boxed, colored view, and refreshes every 60 seconds.
 
 ```text
 herdr open action
   -> src/stockpulse.py
-       -> find or create the herdr-dock workspace
+       -> use current pane, or find/create herdr-dock when no pane is available
        -> do nothing when the stockpulse agent already exists
-       -> herdr plugin pane open
+       -> pane.split + pane.run
             -> src/panel.py
                  -> config.json: symbols and optional iTick token
                  -> src/quotes.py
@@ -25,9 +26,12 @@ herdr open action
 
 ## herdr docking and reporting
 
-The action finds the last non-sidebar pane in the `herdr-dock` workspace and
-splits the StockPulse dashboard below it. If the workspace does not exist, it
-creates it without changing focus.
+When invoked from a pane, the action splits the dashboard below that pane (so
+it shares the dock only when that pane belongs to `herdr-dock`). If there is no
+current pane, it finds or creates `herdr-dock` and splits below its last
+non-sidebar pane. The dashboard command runs in the new pane's shell;
+Ctrl+C stops the command, releases the agent registration, and returns to the
+shell prompt without closing the pane.
 
 The dashboard uses herdr's socket API to:
 
@@ -43,10 +47,11 @@ remaining configured symbols are represented by `$sp_quote_more` as
 `+N more symbols`. The Agents sidebar displays tokens only when its layout
 includes the matching `$sp_quote_*` rows.
 
-The dashboard refresh interval is 60 seconds. Individual provider failures are
-rendered beside their affected symbol. Configuration errors and unexpected
-refresh errors remain visible in the pane, and the latter are retried on the
-next interval.
+The dashboard refresh interval is 60 seconds. Each quote shows its name, price
+and update time; daily rises and falls are colored, and the footer lists quote
+providers in use. Individual provider failures are rendered beside their
+affected symbol. Configuration errors and unexpected refresh errors remain
+visible in the pane, and the latter are retried on the next interval.
 
 ## Providers
 

@@ -16,6 +16,11 @@ See [Usage](docs/usage.md) for installation, configuration, the docked
 dashboard, and Agents sidebar setup. See [Architecture](docs/architecture.md)
 for provider and reporting behavior.
 
+The open action splits a pane below the current pane (or uses `herdr-dock` if
+there is no current pane) and runs a boxed dashboard with colored daily trends.
+Press `Ctrl+C` to stop it; the shell pane remains available, and the action can
+open the dashboard again.
+
 ## Development
 
 ```sh

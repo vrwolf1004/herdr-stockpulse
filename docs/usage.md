@@ -38,13 +38,19 @@ that variable is not set, use:
 
 ## Open the dashboard
 
-Run **StockPulse: open dashboard** from herdr's action menu. It opens a split
-pane in the shared `herdr-dock` workspace. The pane shows the configured
-symbols, current prices, and `▲`/`▼` daily movement. Prices refresh
-automatically every 60 seconds. Press `Ctrl+C` in that pane to close it.
+Run **StockPulse: open dashboard** from herdr's action menu. When invoked from
+a pane, it splits a new pane below the current one; without a current pane, it
+uses a non-sidebar pane in the shared `herdr-dock` workspace. The dashboard is
+drawn in a box, with colored `▲`/`▼` daily movement, quote timestamps, and the
+provider source in its footer. Prices refresh automatically every 60 seconds.
+Press `Ctrl+C` to stop the dashboard and return to the shell prompt; the pane
+itself stays open.
 
-- `herdr-dock` is shared with dock-style plugins such as `herdr-ai-feedbag`, so
-  their agent blocks stay together at the bottom of the Agents sidebar.
+- When invoked from a pane in `herdr-dock`, the dashboard stays with dock-style
+  plugins such as `herdr-ai-feedbag`. With no current pane, the action uses a
+  non-sidebar pane in `herdr-dock`; from another workspace, it splits there.
+  Plugins such as herdr-ai-feedbag or herdr-radio keep the shared dock at the
+  bottom of the Agents sidebar.
 - Only one `stockpulse` agent is opened. Running the action again while it is
   already present does nothing.
 - If creating or locating the dock workspace fails, the action reports the
@@ -64,12 +70,13 @@ herdr plugin action invoke open-windows --plugin herdr-stockpulse
 
 ### Reopen after Ctrl+C
 
-Pressing Ctrl+C in the dashboard closes its pane, and the quotes row leaves the
-sidebar after about 90 seconds. Creating a workspace does not reopen it — run
-"StockPulse: open dashboard" from the herdr command palette, or one of the
-commands above. Typing just `open` in a shell does not work. Put the action
-id first and the plugin in `--plugin`; `herdr plugin action invoke
-herdr-stockpulse open-windows` fails with `unknown option`.
+After Ctrl+C, run **StockPulse: open dashboard** again from the herdr action
+menu, or invoke the action using one of the commands above. The previous
+dashboard releases its agent registration; its sidebar quote rows expire
+within about 90 seconds. Typing just `open` in a shell does not invoke the
+plugin action. Put the action id first and the plugin in `--plugin`;
+`herdr plugin action invoke herdr-stockpulse open-windows` fails with
+`unknown option`.
 
 **StockPulse: refresh configured quotes** remains available when you want a
 one-time refresh in the herdr plugin command log.
