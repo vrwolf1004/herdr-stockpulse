@@ -6,6 +6,11 @@
 
 herdr 대시보드와 Agents 사이드바에서 주식 현재가와 전일 대비 추세를 보여 줍니다. 기본 제공자는 Yahoo Finance이며 iTick은 선택형 대체 제공자입니다.
 
+대시보드는 공유 `herdr-dock` workspace의 2×2 pane 그리드에 배치되며, 현재
+포커스된 workspace를 나누지 않습니다. 도크는 workspace 목록 맨 아래에 유지되고,
+플러그인 블록 세 개가 그리드를 채우면 남은 칸에 소개 pane이 표시됩니다.
+배치와 설정 오류 동작은 [사용법](docs/usage.ko.md)을 참고하세요.
+
 ## 대시보드 디자인
 
 Agents 사이드바:

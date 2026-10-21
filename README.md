@@ -6,6 +6,12 @@ UI languages: English · Korean · Russian · French · Spanish · German · Jap
 
 Show live stock prices and daily trends in a herdr dashboard and the Agents sidebar. Yahoo Finance is used by default; iTick is an optional fallback.
 
+The dashboard opens in the shared `herdr-dock` workspace, placed in its 2×2
+pane grid rather than splitting the currently focused workspace. The dock stays
+at the bottom of the workspace list; when three plugin blocks occupy the grid,
+an introduction pane fills the remaining cell. See the [usage guide](docs/usage.md)
+for placement and configuration-error behavior.
+
 ## Dashboard design
 
 Agents sidebar:

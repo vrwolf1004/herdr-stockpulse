@@ -41,8 +41,10 @@ that variable is not set, use:
 
 Run **StockPulse: open dashboard** from herdr's action menu. The dashboard
 always opens in the shared `herdr-dock` workspace, regardless of the currently
-focused pane or workspace. It reuses a free dock pane when available; otherwise
-it creates a pane in the dock's 2×2 layout. The dashboard is drawn in a box,
+focused pane or workspace. It occupies a cell in the dock's 2×2 pane grid; it
+does not split the currently focused workspace or open a separate window. It
+reuses a free dock pane when available; otherwise it creates a pane in an
+available grid cell. The dashboard is drawn in a box,
 with colored `▲`/`▼` daily movement, quote timestamps, and the provider source
 in its footer. Prices refresh automatically every 60 seconds.
 Press `Ctrl+C` to stop the dashboard and return to the shell prompt; the pane
@@ -51,10 +53,13 @@ itself stays open.
 - The shared `herdr-dock` workspace is kept at the bottom of the workspace
   list, where dock-style plugins such as `herdr-ai-feedbag` appear in the
   Agents sidebar.
+- If three plugin blocks occupy the dock grid and its fourth cell is not
+  already in use, StockPulse fills that cell with a plugin introduction pane.
+  It leaves an existing empty cell available for a later block.
 - Only one `stockpulse` agent is opened. Running the action again while it is
   already present does nothing.
 - If creating or locating the dock workspace fails, the action reports the
-  error and does not open a partial dashboard.
+  error in the action's stderr and does not open a partial dashboard.
 
 You can also invoke the dashboard action directly:
 
@@ -119,7 +124,8 @@ quote slot.
 The row remains visible while the pane is refreshing. If an unexpected refresh
 failure occurs, the dashboard shows its error and retries after 60 seconds.
 Invalid or unreadable configuration is shown as a configuration error in the
-dashboard; correct the file and wait for the next refresh.
+dashboard, and any sidebar quote tokens from the last successful refresh are
+cleared; correct the file and wait for the next refresh.
 
 ```sh
 herdr server reload-config

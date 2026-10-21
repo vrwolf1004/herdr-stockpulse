@@ -12,7 +12,8 @@ herdr open action
   -> src/stockpulse.py
        -> find/create herdr-dock and reuse a free pane or create a grid pane
        -> do nothing when the stockpulse agent already exists
-       -> pane.split + pane.run
+       -> place dashboard in a cell of the dock's 2×2 pane grid, then pane.run
+       -> add the introduction pane when three blocks occupy the grid
             -> src/panel.py
                  -> config.json: symbols and optional iTick token
                  -> src/quotes.py
@@ -26,9 +27,14 @@ herdr open action
 
 ## herdr docking and reporting
 
-The action always finds or creates `herdr-dock`, reusing a free pane or
-splitting the dock's 2×2 layout. The current pane does not affect placement.
-The dashboard command runs in the selected pane's shell;
+The action always finds or creates `herdr-dock` and places the dashboard in a
+free cell of its 2×2 pane grid, reusing a free pane when available. This is
+placement within the shared dock, not a split of the currently focused
+workspace or a separate window. If three plugin blocks occupy the grid and the
+fourth cell is not already in use, the action fills it with the introduction
+pane; an existing empty cell is left available for a later block. The dock
+workspace is moved to the bottom of the workspace list during dashboard
+refreshes. The dashboard command runs in the selected pane's shell;
 Ctrl+C stops the command, releases the agent registration, and returns to the
 shell prompt without closing the pane.
 
