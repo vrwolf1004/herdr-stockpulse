@@ -10,7 +10,7 @@ prices, renders a boxed, colored view, and refreshes every 60 seconds.
 ```text
 herdr open action
   -> src/stockpulse.py
-       -> find/create herdr-dock and reuse a free pane or create a grid pane
+       -> ensure_dock_pane("herdr-stockpulse") from herdr-dock-grid (or the local copy)
        -> do nothing when the stockpulse agent already exists
        -> place dashboard in a cell of the dock's 2×2 pane grid, then pane.run
        -> add the introduction pane when three blocks occupy the grid
@@ -27,16 +27,21 @@ herdr open action
 
 ## herdr docking and reporting
 
-The action always finds or creates `herdr-dock` and places the dashboard in a
-free cell of its 2×2 pane grid, reusing a free pane when available. This is
-placement within the shared dock, not a split of the currently focused
-workspace or a separate window. If three plugin blocks occupy the grid and the
+> `herdr-dock-grid` 연결은 선택입니다. 설치되어 있지 않으면 `src/dock_layout.py` 복사본으로 동작합니다.
+
+The action always places the dashboard in the shared `herdr-dock` workspace's
+2×2 pane grid through `ensure_dock_pane("herdr-stockpulse")`, reusing its own
+pane when available. When the grid is full, the next `herdr-dock2`, `herdr-dock3`
+... workspace is used. This is placement within the shared dock, not a split of
+the currently focused workspace or a separate window. If three plugin blocks occupy the grid and the
 fourth cell is not already in use, the action fills it with the introduction
 pane; an existing empty cell is left available for a later block. The dock
 workspace is moved to the bottom of the workspace list during dashboard
-refreshes. The dashboard command runs in the selected pane's shell;
-Ctrl+C stops the command, releases the agent registration, and returns to the
-shell prompt without closing the pane.
+refreshes. The pane runs `stockpulse dock-host`, which runs the panel and then calls
+`release_dock_pane("herdr-stockpulse")` when the panel exits. Ctrl+C in the
+panel therefore releases the slot as well. If the pane is closed by force, the
+process ends before that call; the allocation and the `herdr-stockpulse.dock`
+marker are then removed by the next `ensure_dock_pane` call (or by `reset`).
 
 The dashboard uses herdr's socket API to:
 

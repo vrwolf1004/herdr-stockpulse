@@ -13,9 +13,23 @@ import time
 from contextlib import contextmanager
 from typing import Any, Optional
 
+import herdr_api
 from quotes import QuoteError, fetch_quote
 from i18n import t
 from render import format_quote
+
+
+def load_dock_layout():
+    """설치된 herdr-dock-grid 가 있으면 그 원본을, 없으면 이 plugin 의 복사본(src/dock_layout.py)을 쓴다."""
+    grid = herdr_api.installed_plugin_path("herdr-dock-grid")
+    if grid:
+        sys.path.insert(0, os.path.join(grid, "src"))
+    import dock_layout
+    return dock_layout
+
+
+layout = load_dock_layout()
+STOCKPULSE_KEY = "herdr-stockpulse"
 
 PLUGIN_ID = "herdr-stockpulse"
 
@@ -93,16 +107,6 @@ def herdr_cli(*args: str) -> dict[str, Any]:
 
 def is_sidebar(pane: dict[str, Any]) -> bool:
     return any(name.startswith(SIDEBAR_TOKEN_PREFIX) for name in (pane.get("tokens") or {}))
-
-
-def dock_workspace() -> str:
-    """herdr-dock workspace 의 id. 없으면 만든다."""
-    workspaces = herdr_cli("workspace", "list").get("workspaces", [])
-    dock = next((w["workspace_id"] for w in workspaces if w.get("label") == DOCK_LABEL), None)
-    if dock is None:
-        created = herdr_cli("workspace", "create", "--label", DOCK_LABEL, "--no-focus")
-        dock = created["workspace"]["workspace_id"]
-    return dock
 
 
 def grid_split(anchor: str, cwd: str) -> str:
@@ -190,23 +194,10 @@ def _open_dashboard() -> int:
     # 대시보드는 dock 의 2x2 격자 안에 들어간다. 빈 pane 이 있으면 쓰고, 없으면 격자로 나눈다.
     # 대시보드가 끝나면(Ctrl+C) 그 셸 프롬프트가 그대로 남는다.
     try:
-        dock = dock_workspace()
-        panes = [p for p in herdr_cli("pane", "list").get("panes", [])
-                 if p["workspace_id"] == dock and not is_sidebar(p)]
-        if not panes:
-            raise RuntimeError(t("dock.no_pane", workspace=dock))
-        agent_panes = {a["pane_id"] for a in agents}
-        free = [p for p in panes if not p.get("tokens") and p["pane_id"] not in agent_panes
-                and (not p.get("label") or p.get("label") == INTRO_LABEL)]
-        if free:
-            pane_id = free[0]["pane_id"]
-            if free[0].get("label") == INTRO_LABEL:
-                herdr_cli("pane", "rename", pane_id, "--clear")  # 소개 칸을 블록이 쓰므로 이름을 지운다
-        else:
-            pane_id = grid_split(panes[0]["pane_id"], SRC_DIR)
-        herdr_cli("pane", "run", pane_id, sys.executable, "-X", "utf8", PANEL_PATH, "--pane", pane_id)
-        ensure_intro(dock, pane_id)
-    except (RuntimeError, ValueError, KeyError) as error:
+        workspace_id, pane_id = layout.ensure_dock_pane(STOCKPULSE_KEY, SRC_DIR)
+        herdr_cli("pane", "run", pane_id, sys.executable, "-X", "utf8", os.path.abspath(__file__), "dock-host", "--pane", pane_id)
+        ensure_intro(workspace_id, pane_id)
+    except (RuntimeError, ValueError, KeyError, herdr_api.HerdrError) as error:
         print(f"StockPulse: {error}", file=sys.stderr)
         return 1
     return 0
@@ -217,13 +208,20 @@ def main() -> int:
         prog="stockpulse",
         description="Display live stock prices and up/down movement from the prior close.",
     )
-    parser.add_argument("action", choices=["quote", "panel"])
+    parser.add_argument("action", choices=["quote", "panel", "dock-host"])
     parser.add_argument("symbols", nargs="*", help="Symbols such as AAPL or 005930.KS")
+    parser.add_argument("--pane", help="dock pane id (dock-host only)")
     parser.add_argument("--config", help="Path to a configuration JSON file")
     args = parser.parse_args()
 
     if args.action == "panel":
         return open_dashboard()
+    if args.action == "dock-host":
+        # 대시보드 pane 안에서 패널을 실행하고, 끝나면(pane 닫힘 또는 Ctrl+C) 도크 자리를 놓아 레지스트리를 비운다.
+        try:
+            return subprocess.call([sys.executable, "-X", "utf8", PANEL_PATH, "--pane", args.pane])
+        finally:
+            layout.release_dock_pane(STOCKPULSE_KEY)
 
     try:
         config = read_config(config_path(args.config))
