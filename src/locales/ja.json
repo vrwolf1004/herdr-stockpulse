@@ -18,5 +18,11 @@
   "quote.error": "エラー: {error}",
   "quote.yahoo_failed": "{symbol}: Yahoo Financeに失敗しました: {yahoo_error}",
   "quote.both_failed": "{symbol}: Yahoo Financeに失敗しました: {yahoo_error}; iTickへの代替も失敗しました: {itick_error}",
-  "quote.bad_response": "{symbol}: Yahoo Finance の応答形式が想定と異なります"
+  "quote.bad_response": "{symbol}: Yahoo Finance の応答形式が想定と異なります",
+  "quote.provider_error": "データ提供元から株価を取得できませんでした",
+  "quote.stale": "遅延",
+  "quote.pending": "相場を待機中",
+  "quote.blocked": "データ提供元がアクセスを制限しました (リクエスト制限またはアクセス拒否)",
+  "quote.bad_format": "データ提供元の応答形式が想定と違います",
+  "quote.hint_itick": "iTick トークンを設定すると代替の取得を使えます"
 }

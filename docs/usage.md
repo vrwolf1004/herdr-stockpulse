@@ -34,6 +34,7 @@ that variable is not set, use:
 
 - Use Yahoo Finance symbols. Korean KOSPI shares use `.KS`; KOSDAQ shares use
   `.KQ`. For example, Samsung Electronics is `005930.KS`.
+- The same symbol is used only once, even if it is listed more than once. Case and surrounding spaces are ignored, and the first position is kept.
 - The plugin uses Yahoo Finance first and calculates the trend from its previous
   close. It shows `▲` for a rise, `▼` for a fall, and `•` when unchanged.
 
@@ -46,7 +47,7 @@ does not split the currently focused workspace or open a separate window. It
 reuses a free dock pane when available; otherwise it creates a pane in an
 available grid cell. The dashboard is drawn in a box,
 with colored `▲`/`▼` daily movement, quote timestamps, and the provider source
-in its footer. Prices refresh automatically every 60 seconds.
+in its footer. Prices refresh automatically every 60 seconds. A quote that does not arrive within 45 seconds is shown with its previous value marked `delayed`; if there is no previous value yet, it shows `waiting for quote`.
 Press `Ctrl+C` to stop the dashboard and return to the shell prompt; the pane
 itself stays open.
 
@@ -119,7 +120,7 @@ the name readable. If a provider does not return a company name, the stock
 symbol is used instead. The first five successful quotes are shown in configured order; additional
 successful quotes are summarized in the `$sp_quote_more` row. A symbol whose
 quote fails is shown as an error in the dashboard and does not take a sidebar
-quote slot.
+quote slot. A request that the provider blocks (rate limit or denied access) is shown as `blocked by the data provider`, and an unexpected response format as `unexpected data format from the provider`. The provider's own error text is not shown.
 
 The row remains visible while the pane is refreshing. If an unexpected refresh
 failure occurs, the dashboard shows its error and retries after 60 seconds.
@@ -139,7 +140,7 @@ python -X utf8 src/stockpulse.py quote AAPL 005930.KS
 
 ## Optional iTick fallback
 
-If Yahoo Finance is unavailable, the plugin can use iTick when a token is set:
+If Yahoo Finance is unavailable, the plugin can use iTick when a token is set. Without a token, a failed quote is followed by the hint `set an iTick token to use the fallback lookup`; with a token, the hint is not shown.
 
 ```json
 {

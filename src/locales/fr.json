@@ -18,5 +18,11 @@
   "quote.error": "Erreur : {error}",
   "quote.yahoo_failed": "{symbol} : échec de Yahoo Finance : {yahoo_error}",
   "quote.both_failed": "{symbol} : échec de Yahoo Finance : {yahoo_error} ; échec du repli iTick : {itick_error}",
-  "quote.bad_response": "{symbol} : réponse inattendue de Yahoo Finance"
+  "quote.bad_response": "{symbol} : réponse inattendue de Yahoo Finance",
+  "quote.provider_error": "impossible d'obtenir la cotation auprès du fournisseur de données",
+  "quote.stale": "en retard",
+  "quote.pending": "en attente de cotation",
+  "quote.blocked": "bloqué par le fournisseur de données (limite de requêtes ou accès refusé)",
+  "quote.bad_format": "format de données inattendu du fournisseur",
+  "quote.hint_itick": "définissez un jeton iTick pour utiliser la consultation de secours"
 }

@@ -18,5 +18,11 @@
   "quote.error": "Ошибка: {error}",
   "quote.yahoo_failed": "{symbol}: Yahoo Finance не сработал: {yahoo_error}",
   "quote.both_failed": "{symbol}: Yahoo Finance не сработал: {yahoo_error}; резервный iTick тоже не сработал: {itick_error}",
-  "quote.bad_response": "{symbol}: неожиданный ответ Yahoo Finance"
+  "quote.bad_response": "{symbol}: неожиданный ответ Yahoo Finance",
+  "quote.provider_error": "не удалось получить котировку от поставщика данных",
+  "quote.stale": "устарело",
+  "quote.pending": "ожидание котировки",
+  "quote.blocked": "заблокировано поставщиком данных (ограничение запросов или доступ запрещён)",
+  "quote.bad_format": "неожиданный формат данных от поставщика",
+  "quote.hint_itick": "задайте токен iTick, чтобы использовать резервный запрос"
 }

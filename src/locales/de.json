@@ -18,5 +18,11 @@
   "quote.error": "Fehler: {error}",
   "quote.yahoo_failed": "{symbol}: Yahoo Finance fehlgeschlagen: {yahoo_error}",
   "quote.both_failed": "{symbol}: Yahoo Finance fehlgeschlagen: {yahoo_error}; iTick-Ersatz ebenfalls fehlgeschlagen: {itick_error}",
-  "quote.bad_response": "{symbol}: unerwartete Antwort von Yahoo Finance"
+  "quote.bad_response": "{symbol}: unerwartete Antwort von Yahoo Finance",
+  "quote.provider_error": "Kursdaten konnten vom Anbieter nicht abgerufen werden",
+  "quote.stale": "veraltet",
+  "quote.pending": "Kurs wird geladen",
+  "quote.blocked": "vom Datenanbieter blockiert (Ratenlimit oder Zugriff verweigert)",
+  "quote.bad_format": "unerwartetes Datenformat vom Anbieter",
+  "quote.hint_itick": "iTick-Token setzen, um die Ersatzabfrage zu nutzen"
 }

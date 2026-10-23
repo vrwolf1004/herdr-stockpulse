@@ -41,6 +41,9 @@ Dashboard:
 ╰──────────────────────────────────────────────────────────────╯
 ```
 
+Rising `▲` moves are shown in green and falling `▼` moves in red; prices refresh
+every 60 seconds.
+
 The values and timestamp above are illustrative; the dashboard shows the
 configured symbols and their latest provider data.
 

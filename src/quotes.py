@@ -24,7 +24,14 @@ RETRY_DELAY_SECONDS = 1
 
 
 class QuoteError(Exception):
-    """A quote provider could not return a valid quote."""
+    """A quote provider could not return a valid quote.
+
+    kind 은 화면 문구를 고르는 범주다: "blocked" (요청 제한, 접근 거부), "bad_format" (응답 구조가 다름), 그 밖은 None.
+    """
+
+    def __init__(self, message="", kind=None):
+        super().__init__(message)
+        self.kind = kind
 
 
 class TransientQuoteError(QuoteError):
@@ -63,12 +70,15 @@ def _get_json(url: str, headers: Optional[dict[str, str]] = None) -> dict[str, A
         with urlopen(request, timeout=REQUEST_TIMEOUT_SECONDS) as response:
             return json.loads(response.read().decode("utf-8"))
     except HTTPError as error:
+        blocked = error.code in (403, 429)  # 요청 제한이나 접근 거부는 차단으로 본다 (429 는 재시도도 한다)
         error_type = TransientQuoteError if error.code == 429 or error.code >= 500 else QuoteError
-        raise error_type(str(error)) from error
+        if blocked:
+            raise error_type(t("quote.blocked"), kind="blocked") from error
+        raise error_type(t("quote.provider_error")) from error
     except (URLError, TimeoutError) as error:
-        raise TransientQuoteError(str(error)) from error
-    except ValueError as error:
-        raise QuoteError(str(error)) from error
+        raise TransientQuoteError(t("quote.provider_error")) from error
+    except ValueError as error:  # JSON 이 아닌 응답은 형식 오류
+        raise QuoteError(t("quote.bad_format"), kind="bad_format") from error
 
 
 def _retry_once_when_transient(fetch: Callable[[], dict[str, Any]]) -> dict[str, Any]:
@@ -102,8 +112,8 @@ def fetch_yahoo(symbol: str, get_json: Callable[..., dict[str, Any]] = _get_json
     chart = _as_dict(payload.get("chart"))
     results = chart.get("result")
     if not isinstance(results, list) or not results or not isinstance(results[0], dict):
-        message = _as_dict(chart.get("error")).get("description") or "No quote data returned"
-        raise QuoteError(str(message))
+        # Yahoo 의 error.description 은 영어 원문이라 화면에 그대로 쓰지 않는다. 결과 구조가 없으면 형식 오류로 본다.
+        raise QuoteError(t("quote.bad_format"), kind="bad_format")
 
     meta = _as_dict(results[0].get("meta"))
     price = _as_float(meta.get("regularMarketPrice"))
@@ -158,7 +168,8 @@ def fetch_quote(symbol: str, itick_token: str = "") -> Quote:
         return fetch_yahoo(symbol)
     except QuoteError as yahoo_error:
         if not itick_token:
-            raise QuoteError(t("quote.yahoo_failed", symbol=symbol, yahoo_error=yahoo_error)) from yahoo_error
+            raise QuoteError(t("quote.yahoo_failed", symbol=symbol, yahoo_error=yahoo_error),
+                             kind=yahoo_error.kind) from yahoo_error
         try:
             return fetch_itick(symbol, itick_token)
         except QuoteError as itick_error:

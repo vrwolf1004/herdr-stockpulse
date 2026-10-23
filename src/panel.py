@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import argparse
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, wait
 import os
 import re
 import time
@@ -21,6 +21,7 @@ AGENT_ID = "stockpulse"
 DOCK_LABEL = "herdr-dock"  # 공용 도크 workspace. 맨 아래에 있어야 사이드바 블록이 위로 밀리지 않는다
 TOKEN_TTL_MS = 90_000
 REFRESH_SECONDS = 60
+QUOTE_DEADLINE_SECONDS = 45  # 한 바퀴에서 종목 조회를 기다리는 최대 시간. REFRESH_SECONDS 보다 짧아야 한다. 넘긴 종목은 직전 값으로 보인다.
 MAX_PARALLEL_REQUESTS = 8
 TITLE = "🐺  herdr-stockpulse  🌕"
 MIN_BOX_INNER = 44
@@ -77,28 +78,50 @@ def quote_lines(quote):
     return [_style(name, "1;97"), _style(price, sgr), _style(f"  {updated}", "90")]
 
 
-def dashboard(symbols, itick_token):
+def error_lines(symbol, error, itick_token):
+    lines = [_style(symbol, "1;97"), _style(f"  {t('quote.error', error=error)}", "31")]
+    if not itick_token:  # 토큰이 없으면 대체 조회를 쓸 수 있다는 것을 알려 준다
+        lines.append(_style(f"  {t('quote.hint_itick')}", "90"))
+    return lines
+
+
+def dashboard(symbols, itick_token, last_quotes=None):
+    """last_quotes: 종목 → 마지막으로 받은 시세. 이번 바퀴에 기한 안에 못 받은 종목은 여기서 직전 값을 가져온다."""
+    if last_quotes is None:
+        last_quotes = {}
     sections = []
     quotes = []
-    # Fetch in parallel so one slow symbol cannot push the refresh past its interval; results keep configured order.
-    with ThreadPoolExecutor(max_workers=MAX_PARALLEL_REQUESTS) as pool:
-        results = list(pool.map(lambda symbol: _fetch_or_error(symbol, itick_token), symbols))
-    for symbol, result in zip(symbols, results):
-        if isinstance(result, QuoteError):
-            sections.append([_style(symbol, "1;97"), _style(f"  {t('quote.error', error=result)}", "31")])
+    # 병렬로 받되 한 바퀴는 QUOTE_DEADLINE_SECONDS 를 넘기지 않는다. 기한 안에 끝나지 않은 조회는 버리고 다음 바퀴에서 다시 한다.
+    pool = ThreadPoolExecutor(max_workers=MAX_PARALLEL_REQUESTS)
+    futures = {symbol: pool.submit(_fetch_or_error, symbol, itick_token) for symbol in symbols}
+    done, _ = wait(list(futures.values()), timeout=QUOTE_DEADLINE_SECONDS)
+    for future in futures.values():
+        future.cancel()  # 아직 시작하지 않은 조회는 취소한다 (이미 도는 것은 끝까지 두고 결과만 버린다)
+    pool.shutdown(wait=False)
+    for symbol in symbols:  # 화면 순서는 설정 순서를 지킨다
+        future = futures[symbol]
+        if future in done:
+            result = future.result()
+            if isinstance(result, QuoteError):
+                sections.append(error_lines(symbol, result, itick_token))
+            else:
+                last_quotes[symbol] = result
+                quotes.append(result)
+                sections.append(quote_lines(result))
+        elif symbol in last_quotes:
+            sections.append(quote_lines(last_quotes[symbol]) + [_style(f"  {t('quote.stale')}", "33")])
         else:
-            quotes.append(result)
-            sections.append(quote_lines(result))
+            sections.append([_style(symbol, "1;97"), _style(f"  {t('quote.pending')}", "90")])
     sources = sorted({quote.source for quote in quotes})
     footer = f"{t('panel.source', sources=' · '.join(sources))}   " if sources else ""
     sections.append([footer + t("panel.refresh", seconds=REFRESH_SECONDS) + "   " + _style(t("panel.close"), "2")])
     return box(sections), sidebar_quote_tokens(quotes)
 
 
-def render_once(explicit_config):
+def render_once(explicit_config, last_quotes=None):
     config = read_config(config_path(explicit_config))
     symbols = symbols_from(config, [])
-    return dashboard(symbols, str(config.get("itick_token", "")))
+    return dashboard(symbols, str(config.get("itick_token", "")), last_quotes)
 
 
 def keep_at_bottom():
@@ -138,11 +161,12 @@ def main():
     parser.add_argument("--pane", help="Pane ID to report the sidebar agent on")
     parser.add_argument("--once", action="store_true", help="Render once and exit")
     args = parser.parse_args()
+    last_quotes = {}  # 종목 → 마지막으로 받은 시세. 바퀴가 바뀌어도 유지되어 지연 표시에 쓴다.
     try:
         while True:
             started = time.monotonic()  # 다음 갱신은 이 시각부터 REFRESH_SECONDS 뒤다 (요청 시간을 포함)
             try:
-                contents, sidebar_value = render_once(args.config)
+                contents, sidebar_value = render_once(args.config, last_quotes)
                 report_sidebar(args.pane, sidebar_value)
                 keep_at_bottom()
             except ValueError as error:

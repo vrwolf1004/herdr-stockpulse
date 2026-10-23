@@ -51,7 +51,7 @@ class RefreshScheduleTest(unittest.TestCase):
         clock = {"now": 100.0}
         sleeps = []
 
-        def slow_render(_config):
+        def slow_render(_config, _last_quotes=None):
             clock["now"] += 20.0  # 요청이 20초 걸렸다
             return "contents", {}
 

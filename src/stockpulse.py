@@ -63,7 +63,8 @@ def symbols_from(config: dict[str, Any], supplied: list[str]) -> list[str]:
     values = supplied or config.get("symbols", [])
     if not isinstance(values, list) or not all(isinstance(symbol, str) and symbol.strip() for symbol in values):
         raise ValueError(t("config.bad_symbols"))
-    symbols = [symbol.strip().upper() for symbol in values]
+    # 같은 종목은 한 번만 조회하고 한 번만 표시한다 (처음 나온 순서 유지)
+    symbols = list(dict.fromkeys(symbol.strip().upper() for symbol in values))
     if not symbols:
         raise ValueError(t("config.no_symbols"))
     return symbols

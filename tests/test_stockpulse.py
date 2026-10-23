@@ -21,6 +21,13 @@ class SymbolsFromTests(unittest.TestCase):
     def test_normalizes_configured_symbols(self):
         self.assertEqual(symbols_from({"symbols": [" 005930.ks "]}, []), ["005930.KS"])
 
+    def test_duplicate_symbols_are_kept_once_in_order(self):
+        self.assertEqual(symbols_from({}, ["AAPL", "aapl", " AAPL "]), ["AAPL"])
+        self.assertEqual(symbols_from({}, ["MSFT", "AAPL", "msft"]), ["MSFT", "AAPL"])
+
+    def test_list_without_duplicates_is_unchanged(self):
+        self.assertEqual(symbols_from({}, ["MSFT", "AAPL"]), ["MSFT", "AAPL"])
+
     def test_rejects_non_string_entries(self):
         with self.assertRaisesRegex(ValueError, "non-empty array"):
             symbols_from({"symbols": ["AAPL", 3]}, [])

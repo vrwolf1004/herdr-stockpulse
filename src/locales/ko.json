@@ -18,5 +18,11 @@
   "quote.error": "오류: {error}",
   "quote.yahoo_failed": "{symbol}: Yahoo Finance 실패: {yahoo_error}",
   "quote.both_failed": "{symbol}: Yahoo Finance 실패: {yahoo_error}; iTick 대체 조회도 실패: {itick_error}",
-  "quote.bad_response": "{symbol}: Yahoo Finance 응답 형식이 예상과 다릅니다"
+  "quote.bad_response": "{symbol}: Yahoo Finance 응답 형식이 예상과 다릅니다",
+  "quote.provider_error": "시세 제공처에서 가져오지 못했습니다",
+  "quote.stale": "지연",
+  "quote.pending": "시세 대기 중",
+  "quote.blocked": "시세 제공처가 요청을 막았습니다 (요청 제한 또는 접근 거부)",
+  "quote.bad_format": "시세 제공처 응답 형식이 예상과 다릅니다",
+  "quote.hint_itick": "iTick 토큰을 설정하면 대체 조회를 쓸 수 있습니다"
 }

@@ -18,5 +18,11 @@
   "quote.error": "Error: {error}",
   "quote.yahoo_failed": "{symbol}: Yahoo Finance falló: {yahoo_error}",
   "quote.both_failed": "{symbol}: Yahoo Finance falló: {yahoo_error}; la alternativa iTick también falló: {itick_error}",
-  "quote.bad_response": "{symbol}: respuesta inesperada de Yahoo Finance"
+  "quote.bad_response": "{symbol}: respuesta inesperada de Yahoo Finance",
+  "quote.provider_error": "no se pudo obtener la cotización del proveedor de datos",
+  "quote.stale": "retrasado",
+  "quote.pending": "esperando cotización",
+  "quote.blocked": "bloqueado por el proveedor de datos (límite de peticiones o acceso denegado)",
+  "quote.bad_format": "formato de datos inesperado del proveedor",
+  "quote.hint_itick": "configure un token de iTick para usar la consulta alternativa"
 }
