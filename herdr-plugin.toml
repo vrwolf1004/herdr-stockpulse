@@ -1,6 +1,6 @@
 id = "herdr-stockpulse"
 name = "herdr-stockpulse"
-version = "0.5.5"
+version = "0.6.0"
 min_herdr_version = "0.9.0"
 platforms = ["windows", "linux", "macos"]
 description = "Live stock prices with clear up/down trend indicators"
